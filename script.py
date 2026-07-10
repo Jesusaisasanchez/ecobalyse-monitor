@@ -15,7 +15,7 @@ URL = "https://affichage-environnemental.ecobalyse.beta.gouv.fr/"
 DATA_FILE = "data.json"
 
 EMAIL = " ecobalyse.monitor@gmail.com"
-PASSWORD = " Ecoscoreadidas1*"
+PASSWORD = "sbgo mqwx pnyq qhat"
 TO = ["jesus.aisa@adidas.com", " Maira.SchillerBecerra@adidas.com"]
 
 driver = webdriver.Chrome()
