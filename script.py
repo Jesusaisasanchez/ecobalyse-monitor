@@ -18,7 +18,16 @@ EMAIL = " ecobalyse.monitor@gmail.com"
 PASSWORD = "sbgo mqwx pnyq qhat"
 TO = ["jesus.aisa@adidas.com", " Maira.SchillerBecerra@adidas.com"]
 
-driver = webdriver.Chrome()
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+
+options = Options()
+options.binary_location = "/usr/bin/chromium-browser"
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
+driver = webdriver.Chrome(service=Service("/usr/bin/chromedriver"), options=options)
 driver.get(URL)
 time.sleep(3)
 
