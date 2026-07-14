@@ -1,4 +1,5 @@
 name: Daily Ecobalyse Monitor
+run: pip install requests beautifulsoup4
 
 on:
   schedule:
