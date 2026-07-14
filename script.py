@@ -21,8 +21,7 @@ results = {}
 # ✅ FETCH DATA
 for brand in BRANDS:
     try:
-        ssearch_url = f"https://affichage-
-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
+        search_url = f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
 
         response = requests.get(search_url)
         text = response.text
