@@ -1,5 +1,4 @@
 name: Daily Ecobalyse Monitor
-run: pip install requests beautifulsoup4
 
 on:
   schedule:
@@ -12,12 +11,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      
+
       - uses: actions/setup-python@v4
 
       - name: Install dependencies
-        run: pip install requests
+        run: pip install requests beautifulsoup4
 
       - name: Run script
         run: python script.py
-          
