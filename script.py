@@ -1,45 +1,42 @@
-import requests
+from playwright.sync_api import sync_playwright
 import json
 import smtplib
 from email.mime.text import MIMEText
 import os
+import re
 
-# ✅ CONFIG
 BRANDS = ["Adidas", "Nike", "Puma", "Decathlon", "Intersport France"]
 
 DATA_FILE = "data.json"
 
 EMAIL = "ecobalyse.monitor@gmail.com"
-PASSWORD = "sbgo mqwx pnyq qhat"
+PASSWORD = "PASTE_YOUR_APP_PASSWORD_HERE"
 TO = ["jesus.aisa@adidas.com"]
 
 results = {}
 
-# ✅ REAL API (this works)
-API_URL = "https://affichage-environnemental.ecobalyse.beta.gouv.fr/api/marques"
-
-try:
-    response = requests.get(API_URL)
-    data = response.json()
+with sync_playwright() as p:
+    browser = p.chromium.launch(headless=True)
+    page = browser.new_page()
 
     for brand in BRANDS:
-        found = False
+        try:
+            page.goto(f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}")
+            page.wait_for_timeout(4000)
 
-        for item in data:
-            name = item.get("nom", "").lower()
+            text = page.inner_text("body")
 
-            if brand.lower() in name:
-                results[brand] = item.get("nbReferences", 0)
-                found = True
-                break
+            match = re.search(r"(\d+)\s+références produit", text)
 
-        if not found:
+            if match:
+                results[brand] = int(match.group(1))
+            else:
+                results[brand] = None
+
+        except:
             results[brand] = None
 
-except:
-    for brand in BRANDS:
-        results[brand] = None
-
+    browser.close()
 
 # ✅ LOAD PREVIOUS
 old = {}
