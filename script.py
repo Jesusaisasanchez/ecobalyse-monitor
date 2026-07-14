@@ -1,5 +1,4 @@
 import requests
-import re
 import json
 import smtplib
 from email.mime.text import MIMEText
@@ -11,32 +10,38 @@ BRANDS = ["Adidas", "Nike", "Puma", "Decathlon", "Intersport France"]
 DATA_FILE = "data.json"
 
 EMAIL = "ecobalyse.monitor@gmail.com"
-PASSWORD = "sbgo mqwx pnyq qhat"
+PASSWORD = "PASTE_YOUR_APP_PASSWORD_HERE"
 TO = ["jesus.aisa@adidas.com"]
 
 results = {}
 
-# ✅ FETCH DATA
-for brand in BRANDS:
-    try:
-        search_url = f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
+# ✅ REAL API (this works)
+API_URL = "https://affichage-environnemental.ecobalyse.beta.gouv.fr/api/marques"
 
-        response = requests.get(search_url)
-        text = response.text
+try:
+    response = requests.get(API_URL)
+    data = response.json()
 
-        # ✅ Extract number directly from page
-        match = re.search(r"(\d{1,5})\s+références produit", text)
+    for brand in BRANDS:
+        found = False
 
-        if match:
-            results[brand] = int(match.group(1))
-        else:
+        for item in data:
+            name = item.get("nom", "").lower()
+
+            if brand.lower() in name:
+                results[brand] = item.get("nbReferences", 0)
+                found = True
+                break
+
+        if not found:
             results[brand] = None
 
-    except:
+except:
+    for brand in BRANDS:
         results[brand] = None
 
 
-# ✅ LOAD PREVIOUS DATA
+# ✅ LOAD PREVIOUS
 old = {}
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE) as f:
@@ -59,7 +64,7 @@ for brand in BRANDS:
         else:
             message += f"{brand}: {prev or 0} → {new}\n"
 
-# ✅ SAVE DATA
+# ✅ SAVE
 with open(DATA_FILE, "w") as f:
     json.dump(results, f)
 
