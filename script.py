@@ -21,7 +21,8 @@ results = {}
 # ✅ FETCH DATA
 for brand in BRANDS:
     try:
-        search_url = f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
+        ssearch_url = f"https://affichage-
+environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
 
         response = requests.get(search_url)
         text = response.text
@@ -33,6 +34,10 @@ for brand in BRANDS:
            
         else:
             results[brand] = None
+            
+        except:
+            results[brand] = None
+
 
 # ✅ LOAD PREVIOUS
 old = {}
