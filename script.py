@@ -4,6 +4,7 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 import os
+from bs4 import BeautifulSoup
 
 # ✅ CONFIG
 BRANDS = ["Adidas", "Nike", "Puma", "Decathlon", "Intersport France"]
@@ -11,23 +12,34 @@ BRANDS = ["Adidas", "Nike", "Puma", "Decathlon", "Intersport France"]
 DATA_FILE = "data.json"
 
 EMAIL = "ecobalyse.monitor@gmail.com"
-PASSWORD = "sbgo mqwx pnyq qhat"
+PASSWORD = "PASTE_YOUR_APP_PASSWORD_HERE"
 TO = ["jesus.aisa@adidas.com"]
 
 results = {}
 
-# ✅ FETCH DATA
+# ✅ FETCH DATA (correct logic: search → open brand page → extract count)
 for brand in BRANDS:
     try:
         search_url = f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
 
         response = requests.get(search_url)
-        text = response.text
+        soup = BeautifulSoup(response.text, "html.parser")
 
-        match = re.search(r"(\d+)\s+références produit", text)
+        # find first valid brand link
+        link = soup.find("a", href=True)
 
-        if match:
-            results[brand] = int(match.group(1))
+        if link and "/marques/" in link["href"]:
+            brand_url = "https://affichage-environnemental.ecobalyse.beta.gouv.fr" + link["href"]
+
+            response2 = requests.get(brand_url)
+            text = response2.text
+
+            match = re.search(r"(\d+)\s+références produit", text)
+
+            if match:
+                results[brand] = int(match.group(1))
+            else:
+                results[brand] = None
         else:
             results[brand] = None
 
@@ -35,7 +47,7 @@ for brand in BRANDS:
         results[brand] = None
 
 
-# ✅ LOAD PREVIOUS
+# ✅ LOAD PREVIOUS DATA
 old = {}
 if os.path.exists(DATA_FILE):
     with open(DATA_FILE) as f:
@@ -58,7 +70,7 @@ for brand in BRANDS:
         else:
             message += f"{brand}: {prev or 0} → {new}\n"
 
-# ✅ SAVE
+# ✅ SAVE DATA
 with open(DATA_FILE, "w") as f:
     json.dump(results, f)
 
