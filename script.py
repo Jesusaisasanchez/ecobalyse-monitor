@@ -4,7 +4,6 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 import os
-from bs4 import BeautifulSoup
 
 # ✅ CONFIG
 BRANDS = ["Adidas", "Nike", "Puma", "Decathlon", "Intersport France"]
@@ -17,29 +16,19 @@ TO = ["jesus.aisa@adidas.com"]
 
 results = {}
 
-# ✅ FETCH DATA (correct logic: search → open brand page → extract count)
+# ✅ FETCH DATA
 for brand in BRANDS:
     try:
         search_url = f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
 
         response = requests.get(search_url)
-        soup = BeautifulSoup(response.text, "html.parser")
+        text = response.text
 
-        # find first valid brand link
-        link = soup.find("a", href=True)
+        # ✅ Extract number directly from page
+        match = re.search(r"(\d{1,5})\s+références produit", text)
 
-        if link and "/marques/" in link["href"]:
-            brand_url = "https://affichage-environnemental.ecobalyse.beta.gouv.fr" + link["href"]
-
-            response2 = requests.get(brand_url)
-            text = response2.text
-
-            match = re.search(r"(\d+)\s+références produit", text)
-
-            if match:
-                results[brand] = int(match.group(1))
-            else:
-                results[brand] = None
+        if match:
+            results[brand] = int(match.group(1))
         else:
             results[brand] = None
 
