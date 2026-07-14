@@ -3,6 +3,7 @@ import json
 import smtplib
 from email.mime.text import MIMEText
 import os
+import re
 
 # ✅ CONFIG
 BRANDS = ["Adidas", "Nike", "Puma", "Decathlon", "Intersport France"]
@@ -20,15 +21,18 @@ results = {}
 # ✅ FETCH DATA
 for brand in BRANDS:
     try:
-        response = requests.get(BASE_URL + brand)
-        data = response.json()
+        search_url = f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
 
-        if len(data) > 0:
-            results[brand] = data[0].get("nbReferences", 0)
+        response = requests.get(search_url)
+        text = response.text
+
+        match = re.search(r"(\d+)\s+références produit", text)
+
+        if match:
+            results[brand] = int(match.group(1))
+           
         else:
             results[brand] = None
-    except:
-        results[brand] = None
 
 # ✅ LOAD PREVIOUS
 old = {}
