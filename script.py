@@ -48,18 +48,21 @@ if os.path.exists(DATA_FILE):
 message = "Daily Ecobalyse Monitoring\n\n"
 
 for brand in BRANDS:
-    new = results.get(brand)
-    prev = old.get(brand)
+    try:
+        search_url = f"https://affichage-environnemental.ecobalyse.beta.gouv.fr/marques?search={brand}"
 
-    if new is None:
-        message += f"{brand}: no products yet\n"
-    else:
-        diff = new - (prev or 0)
+        response = requests.get(search_url)
+        text = response.text
 
-        if diff > 0:
-            message += f"✅ {brand}: {prev or 0} → {new} (+{diff})\n"
+        match = re.search(r"(\d+)\s+références produit", text)
+
+        if match:
+            results[brand] = int(match.group(1))
         else:
-            message += f"{brand}: {prev or 0} → {new}\n"
+            results[brand] = None
+
+    except:
+        results[brand] = None
 
 # ✅ SAVE
 with open(DATA_FILE, "w") as f:
