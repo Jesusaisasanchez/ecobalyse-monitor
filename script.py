@@ -12,7 +12,7 @@ BRANDS = ["Adidas", "Nike", "Puma", "Decathlon", "Intersport France"]
 DATA_FILE = "data.json"
 
 EMAIL = "ecobalyse.monitor@gmail.com"
-PASSWORD = "PASTE_YOUR_APP_PASSWORD_HERE"
+PASSWORD = "sbgo mqwx pnyq qhat"
 TO = ["jesus.aisa@adidas.com"]
 
 results = {}
